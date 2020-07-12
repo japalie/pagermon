@@ -45,6 +45,24 @@ const bruteforcelogin = new ExpressBrute(store, {
 
 // End Bruteforce
 
+router.route('/forgot')
+.get (function(req,res) {
+        if (!req.isAuthenticated()) {
+                let user = '';
+                if (typeof req.username !== 'undefined') {
+                        user = req.username;
+                }
+                res.render('auth', {
+                        pageTitle: 'User',
+                });
+        } else {
+                res.redirect('/');
+        }
+})
+.post(function (req, res) {
+        
+}) 
+
 router.route('/login')
         .get(function(req, res) {
                 if (!req.isAuthenticated()) {

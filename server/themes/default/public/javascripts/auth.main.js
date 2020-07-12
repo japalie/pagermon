@@ -3,6 +3,12 @@ angular.module('app', ['ngRoute', 'ngResource', 'ngSanitize', 'angular-uuid', 'u
     .factory('Api', ['$resource',
         function ($resource) {
             return {
+                Forgot: $resource('/auth/forgot/', null, {
+                    'post': { method: 'POST', isArray: false }
+                }),
+                ForgotReset: $resource('/auth/forgot/:token', { token: '@token' }, {
+                    'post': { method: 'POST', isArray: false }
+                }),
                 Login: $resource('/auth/login/', null, {
                     'post': { method: 'POST', isArray: false }
                 }),
@@ -26,6 +32,61 @@ angular.module('app', ['ngRoute', 'ngResource', 'ngSanitize', 'angular-uuid', 'u
                 })
             };
         }])
+    .controller('ForgotController', ['$scope', '$routeParams', 'Api', '$uibModal', '$filter', '$location', '$timeout', '$window', function ($scope, $routeParams, Api, $uibModal, $filter, $location, $timeout, $window) {
+        $scope.resetMessage = {};
+        $scope.resetSubmit = function () {
+            $scope.loading = false
+            var vars = { 'user': $scope.user, 'password': $scope.password };
+
+            Api.Reset.post(null, vars).$promise.then(function (response) {
+                console.log(response);
+                $scope.loading = false;
+                if (response.status == 'ok') {
+                    $window.location.href = response.redirect
+                } else {
+                    $scope.resetMessage.text = 'Failed to reset password: ' + response.data.error;
+                    $scope.resetMessage.type = 'alert-danger';
+                    $scope.resetMessage.show = true;
+                    $timeout(function () { $scope.resetMessage.show = false; }, 3000);
+                }
+            }, function (response) {
+                console.log(response);
+                $scope.resetMessage.text = 'Failed to reset password: ' + response.data.error;
+                $scope.resetMessage.type = 'alert-danger';
+                $scope.resetMessage.show = true;
+                $timeout(function () { $scope.resetMessage.show = false; }, 3000);
+                $scope.loading = false;
+            });
+        };
+    }])
+
+    .controller('ForgotResetController', ['$scope', '$routeParams', 'Api', '$uibModal', '$filter', '$location', '$timeout', '$window', function ($scope, $routeParams, Api, $uibModal, $filter, $location, $timeout, $window) {
+        $scope.resetMessage = {};
+        $scope.resetSubmit = function () {
+            $scope.loading = false
+            var vars = { 'user': $scope.user, 'password': $scope.password };
+
+            Api.Reset.post(null, vars).$promise.then(function (response) {
+                console.log(response);
+                $scope.loading = false;
+                if (response.status == 'ok') {
+                    $window.location.href = response.redirect
+                } else {
+                    $scope.resetMessage.text = 'Failed to reset password: ' + response.data.error;
+                    $scope.resetMessage.type = 'alert-danger';
+                    $scope.resetMessage.show = true;
+                    $timeout(function () { $scope.resetMessage.show = false; }, 3000);
+                }
+            }, function (response) {
+                console.log(response);
+                $scope.resetMessage.text = 'Failed to reset password: ' + response.data.error;
+                $scope.resetMessage.type = 'alert-danger';
+                $scope.resetMessage.show = true;
+                $timeout(function () { $scope.resetMessage.show = false; }, 3000);
+                $scope.loading = false;
+            });
+        };
+    }])
 
     .controller('LoginController', ['$scope', '$routeParams', 'Api', '$uibModal', '$filter', '$location', '$timeout', '$window', function ($scope, $routeParams, Api, $uibModal, $filter, $location, $timeout, $window) {
         $scope.loading = false;
@@ -224,6 +285,14 @@ angular.module('app', ['ngRoute', 'ngResource', 'ngSanitize', 'angular-uuid', 'u
 
     .config(['$routeProvider', '$locationProvider', '$httpProvider', function ($routeProvider, $locationProvider, $httpProvider) {
         $routeProvider
+            .when('/forgot', {
+                templateUrl: '/templates/auth/forgot.html',
+                controller: 'ForgotController'
+            })
+            .when('/forgot/:token', {
+                templateUrl: '/templates/auth/forgotReset.html',
+                controller: 'ForgotResetController'
+            })
             .when('/login', {
                 templateUrl: '/templates/auth/login.html',
                 controller: 'LoginController'
