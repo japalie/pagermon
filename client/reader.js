@@ -75,7 +75,24 @@ rl.on('line', (line) => {
     if (/POCSAG(\d+): Address: /.test(line)) {
         address = line.match(/POCSAG(\d+): Address:(.*?)Function/)[2].trim();
         if (sendFunctionCode) {
-            address += line.match(/POCSAG(\d+): Address:(.*?)Function: (\d)/)[3];
+            var functioncode = line.match(/POCSAG(\d+): Address:(.*?)Function: (\d)/)[3];
+            if(functioncode == "0")
+            {
+            address += ".A";
+            }
+            else if(functioncode == "1")
+            {
+                    address += ".B";
+            }
+            else if(functioncode == "2")
+            {
+                    address += ".C";
+            }
+            else if(functioncode == "3")
+            {
+                    address += ".D";
+            }
+            // ORIGINAL: address += line.match(/POCSAG(\d+): Address:(.*?)Function: (\d)/)[3];
         }
         if (line.indexOf('Alpha:') > -1) {
             message = line.match(/Alpha:(.*?)$/)[1].trim();
